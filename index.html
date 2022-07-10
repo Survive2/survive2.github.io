@@ -250,7 +250,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2022/07/10/CISCN2022-Duck/" target="_self">
         <div>
-          CISCN2022 Duck Write Up该题目附件我已经上传到Github，有需要的可以下载，复现这题时，我是使用的NSSCTF提供的远程环境。 此题是一道libc2.34的题，libc2.34与2.33最大的不同就是移除了以往常用的malloc_hook，free_hook等hook函数，导致利用上较为困难，2.34与2.33一样，chunk的fd指针都采用了异或加密，在申请chunk时便
+          该题目附件我已经上传到Github，有需要的可以下载，复现这题时，我是使用的NSSCTF提供的远程环境。 此题是一道libc2.34的题，libc2.34与2.33最大的不同就是移除了以往常用的malloc_hook，free_hook等hook函数，导致利用上较为困难，2.34与2.33一样，chunk的fd指针都采用了异或加密，在申请chunk时便会异或解密，所以当我们改写fd指针时，只需要将
         </div>
       </a>
 
@@ -304,7 +304,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2022/07/10/CISCN2022-BigDuck/" target="_self">
         <div>
-          CISCN2022 BigDuck Write Up该题目附件我已经上传到Github，有需要的可以下载，复现这题时，我是使用的NSSCTF提供的远程环境。 此题是一道libc2.33的题，其实和Duck那题差不多，只不过开了沙箱，禁用了execve，那么我们只需要orw去读取flag就行了。2.33的chunk的fd指针也都采用了异或加密，如何应对加密，在Duck那题中已经说过了，这里就不再赘述
+          该题目附件我已经上传到Github，有需要的可以下载，复现这题时，我是使用的NSSCTF提供的远程环境。 此题是一道libc2.33的题，其实和Duck那题差不多，只不过开了沙箱，禁用了execve，那么我们只需要orw去读取flag就行了。2.33的chunk的fd指针也都采用了异或加密，如何应对加密，在Duck那题中已经说过了，这里就不再赘述，不懂的可以去看我Duck那篇题解。 利用思路和du
         </div>
       </a>
 
