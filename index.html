@@ -242,6 +242,60 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/2022/07/24/Kokodayo-Wp/" target="_self">
+          Kokodayo-Wp
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/07/24/Kokodayo-Wp/" target="_self">
+        <div>
+          前几天无意间看到有师傅在询问最短的shellcode的长度是多少，询问之后发现是这个题目只允许写入0x11字节的shellcode，正好本人汇编水平非常的拉，所以想借这题练习练习。 打开虚拟机发现保护全开，是64位的，拖进IDA反汇编后查看伪代码，在如下图中的位置：   可以发现，程序使用mmap开辟了空间，并向该内存读入了0x11个字节，并且使用mprotect来修改该区域的权限，讲一下mpro
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-07-24 11:15" pubdate>
+              2022-07-24
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF-PWN/" class="category-chain-item">CTF-PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/2022/07/17/DSCTF2022%20fuzzer-Wp/" target="_self">
           DSCTF2022 fuzzer-Wp
         </a>
