@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta name="description" content="h1J4cker&#39;s Blog" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>语法分析器(Parser)的实现 |  h1J4cker&#39;s Blog</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/images/h1J4cker.png" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FTH4BWMNR9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FTH4BWMNR9');
+</script>
+
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    </head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      <canvas class="fireworks"></canvas>
+      <style>
+        .fireworks {
+          position: fixed;
+          left: 0;
+          top: 0;
+          z-index: 99999;
+          pointer-events: none;
+        }
+      </style>
+      
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-语法分析器(Parser)的实现"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  语法分析器(Parser)的实现
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/posts/c3fa513f/" class="article-date">
+  <time datetime="2022-11-21T08:29:29.000Z" itemprop="datePublished">2022-11-21</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Compiler/">Compiler</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">3.3k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">13 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <ul>
+<li><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>语法分析器实现参考自文章：</p>
+<p>(<a target="_blank" rel="noopener" href="https://llvm-tutorial-cn.readthedocs.io/en/latest/chapter-2.html">https://llvm-tutorial-cn.readthedocs.io/en/latest/chapter-2.html</a>)</p>
+</li>
+<li><h1 id="抽象语法树的定义"><a href="#抽象语法树的定义" class="headerlink" title="抽象语法树的定义"></a>抽象语法树的定义</h1><p>抽象语法树的作用在于牢牢抓住程序的脉络，从而方便编译过程的后续环节（如代码生成）对程序进行解读。</p>
+<p>我们可以分别定义出所有语法结构的抽象语法树。</p>
+<p>我们先定义一个基类，并让其他的类继承于它：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ExprAST</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">ExprAST</span>()&#123;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>对于常量的抽象语法树的定义如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">NumExprAST</span> : <span class="keyword">public</span> ExprAST&#123;</span><br><span class="line">    <span class="type">double</span> __Val;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">NumExprAST</span>(<span class="type">double</span> val): __Val(val) &#123;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>当然，对于其他语法结构，如二元运算符，变量，函数等语法结构的定义也大同小异：<span id="more"></span></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">VarExprAST</span> : <span class="keyword">public</span> ExprAST&#123;</span><br><span class="line">    std::string __Name;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">VarExprAST</span>(<span class="type">const</span> string &amp;name) : __Name(name) &#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BinExprAST</span> : <span class="keyword">public</span> ExprAST&#123;</span><br><span class="line">    <span class="type">char</span> __op;</span><br><span class="line">    ExprAST *__LHS, *__RHS;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">BinExprAST</span>(<span class="type">char</span> op,ExprAST *lhs, ExprAST *rhs) : __op(op),__LHS(lhs),__RHS(rhs) &#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CallExprAST</span> : <span class="keyword">public</span> ExprAST&#123;</span><br><span class="line">    std::string __Callee;</span><br><span class="line">    std::vector&lt;ExprAST*&gt; __Args;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">CallExprAST</span>(std::string &amp;callee, std::vector&lt;ExprAST*&gt; Args) : __Callee(callee),__Args(Args) &#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这里你可能会比较好奇为什么在二元运算符的抽象语法树中，定义了两个<code>ExprAST</code>类型的指针呢，我们来看一个例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*假如有如下表达式</span></span><br><span class="line"><span class="comment">    x + y;</span></span><br><span class="line"><span class="comment">  那么我们要表示他需要创建三个抽象语法树的对象：</span></span><br><span class="line"><span class="comment">  1.x ==&gt; variable ==&gt; ExprAST *X = new VarExprAST(&quot;X&quot;);</span></span><br><span class="line"><span class="comment">  2.y ==&gt; variable ==&gt; ExprAST *Y = new VarExprAST(&quot;Y&quot;);</span></span><br><span class="line"><span class="comment">  前两个我已经给出了，由于x与y是变量，所以是VarExprAST类的，但是当我们整体来看表达式：x+y，他是属于BinExprAST的，当然x与y是属于VarExprAST的，我们令Reslut = X+Y，即可得出以下表达式：</span></span><br><span class="line"><span class="comment">  3.Result ==&gt; Binary Opcode ==&gt; ExprAST *Result = new BinExprAST(&quot;+&quot;,X,Y);</span></span><br><span class="line"><span class="comment">  这就可以看出为什么有两个ExprAST类型的指针，因为他们分别执行运算符两端的数据：X与Y。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">ExprAST *X = <span class="keyword">new</span> <span class="built_in">VariableExprAST</span>(<span class="string">&quot;x&quot;</span>);</span><br><span class="line">ExprAST *Y = <span class="keyword">new</span> <span class="built_in">VariableExprAST</span>(<span class="string">&quot;y&quot;</span>);</span><br><span class="line">ExprAST *Result = <span class="keyword">new</span> <span class="built_in">BinaryExprAST</span>(<span class="string">&#x27;+&#x27;</span>, X, Y);</span><br></pre></td></tr></table></figure>
+</li>
+<li><h1 id="语法解析器"><a href="#语法解析器" class="headerlink" title="语法解析器"></a>语法解析器</h1><p>我们先从一些简单的辅助函数开始定义：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> CurTok;</span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">getNextToken</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> CurTok = <span class="built_in">gettok</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码以词法分析器为中心，实现了一个简易的语元缓冲，让我们能够预先读取词法分析器将要返回的下一个语元。在我们的语法解析器中，所有函数都将<code>CurTok</code>视作当前待解析的语元。</p>
+<p>再定义三个用于报错的函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ExprAST *<span class="title">Error</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *Str)</span> </span>&#123; <span class="built_in">fprintf</span>(stderr, <span class="string">&quot;Error: %s\n&quot;</span>, Str);<span class="keyword">return</span> <span class="number">0</span>;&#125;</span><br><span class="line"><span class="function">PrototypeAST *<span class="title">ErrorP</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *Str)</span> </span>&#123; <span class="built_in">Error</span>(Str); <span class="keyword">return</span> <span class="number">0</span>; &#125;</span><br><span class="line"><span class="function">FunctionAST *<span class="title">ErrorF</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *Str)</span> </span>&#123; <span class="built_in">Error</span>(Str); <span class="keyword">return</span> <span class="number">0</span>; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>定义好这三个函数之后，我们就可以开始解析我们的表达式了</p>
+</li>
+<li><h1 id="解析基本表达式"><a href="#解析基本表达式" class="headerlink" title="解析基本表达式"></a>解析基本表达式</h1><p>我们先从常量开始解析，解析常量的函数很简单：调用它的时候，当前待解析语元只能是<code>tok_number</code>。该函数用刚解析出的数值构造出了一个<code>NumberExprAST</code>节点，然后令词法分析器继续读取下一个语元，最后返回构造的AST节点。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> ExprAST *<span class="title">ParseNumberExpr</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  ExprAST *Result = <span class="keyword">new</span> <span class="built_in">NumberExprAST</span>(NumVal);</span><br><span class="line">  <span class="built_in">getNextToken</span>(); </span><br><span class="line">  <span class="keyword">return</span> Result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来解析变量与函数的调用，该函数与其它函数区别不大。（调用该函数时当前语元必须是<code>tok_identifier</code>。）这里采用了<strong>预读</strong>（lookahead）的手段来试探当前标识符的类型，判断它究竟是个独立的变量引用还是个函数调用。只要检查紧跟标识符之后的语元是不是“<code>(</code>”，它就能知道到底应该构造<code>VarExprAST</code>节点还是<code>CallExprAST</code>节点。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> ExprAST *<span class="title">ParseIdentifierExpr</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  std::string IdName = IdentifierStr;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">getNextToken</span>(); </span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (CurTok != <span class="string">&#x27;(&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">VariableExprAST</span>(IdName);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">getNextToken</span>(); </span><br><span class="line">  std::vector&lt;ExprAST*&gt; Args;</span><br><span class="line">  <span class="keyword">if</span> (CurTok != <span class="string">&#x27;)&#x27;</span>) &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">      ExprAST *Arg = <span class="built_in">ParseExpression</span>();</span><br><span class="line">      <span class="keyword">if</span> (!Arg) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">      Args.<span class="built_in">push_back</span>(Arg);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (CurTok == <span class="string">&#x27;)&#x27;</span>) <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (CurTok != <span class="string">&#x27;,&#x27;</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">Error</span>(<span class="string">&quot;Expected &#x27;)&#x27; or &#x27;,&#x27; in argument list&quot;</span>);</span><br><span class="line">      <span class="built_in">getNextToken</span>();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">getNextToken</span>();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">CallExprAST</span>(IdName, Args);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>到这里，基本表达式全都搞定了，下面开始开始着手解析更为复杂的二元表达式。</p>
+</li>
+<li><h1 id="解析二元表达式-来自参考文章"><a href="#解析二元表达式-来自参考文章" class="headerlink" title="解析二元表达式(来自参考文章)"></a>解析二元表达式(来自参考文章)</h1><p>二元表达式的解析难度要大得多，因为它们往往具有二义性。例如，给定字符串“<code>x+y*z</code>”，语法解析器既可以将之解析为“<code>(x+y)*z</code>”，也可以将之解析为“<code>x+(y*z)</code>”。按照通常的数学定义，我们期望解析成后者，因为“<code>*</code>”（乘法）的优先级要高于“<code>+</code>”（加法）。</p>
+<p>这个问题的解法很多，其中属<a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Operator-precedence_parser">运算符优先级解析</a>最为优雅和高效。这是一种利用二元运算符的优先级来引导递归调用走向的解析技术。首先，我们需要制定一张优先级表：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// BinopPrecedence - This holds the precedence for each binary operator that is</span></span><br><span class="line"><span class="comment">/// defined.</span></span><br><span class="line"><span class="type">static</span> std::map&lt;<span class="type">char</span>, <span class="type">int</span>&gt; BinopPrecedence;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// GetTokPrecedence - Get the precedence of the pending binary operator token.</span></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">GetTokPrecedence</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!<span class="built_in">isascii</span>(CurTok))</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Make sure it&#x27;s a declared binop.</span></span><br><span class="line">  <span class="type">int</span> TokPrec = BinopPrecedence[CurTok];</span><br><span class="line">  <span class="keyword">if</span> (TokPrec &lt;= <span class="number">0</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  <span class="keyword">return</span> TokPrec;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">// Install standard binary operators.</span></span><br><span class="line">  <span class="comment">// 1 is lowest precedence.</span></span><br><span class="line">  BinopPrecedence[<span class="string">&#x27;&lt;&#x27;</span>] = <span class="number">10</span>;</span><br><span class="line">  BinopPrecedence[<span class="string">&#x27;+&#x27;</span>] = <span class="number">20</span>;</span><br><span class="line">  BinopPrecedence[<span class="string">&#x27;-&#x27;</span>] = <span class="number">20</span>;</span><br><span class="line">  BinopPrecedence[<span class="string">&#x27;*&#x27;</span>] = <span class="number">40</span>;  <span class="comment">// highest.</span></span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>函数<code>GetTokPrecedence</code>用于查询当前语元的优先级，如果当前语元不是二元运算符则返回<code>-1</code>。这里的<code>map</code>简化了新运算符的添加，同时也可以证明我们的算法与具体的运算符无关。当然，要想去掉<code>map</code>直接在<code>GetTokPrecedence</code>中比较优先级也很简单。（甚至可以直接使用定长数组）。</p>
+<p>有了上面的函数作为辅助，我们就可以开始解析二元表达式了。运算符优先级解析的基本思想就是通过拆解含有二元运算符的表达式来解决可能的二义性问题。以表达式“<code>a+b+(c+d)*e*f+g</code>”为例，在进行运算符优先级解析时，它将被视作一串按二元运算符分隔的主表达式。按照这个思路，解析出来的第一个主表达式应该是“<code>a</code>”，紧跟着是若干个有序对，即：<code>[+, b]</code>、<code>[+, (c+d)]</code>、<code>[*, e]</code>、<code>[*, f]</code>和<code>[+, g]</code>。注意，括号表达式也是主表达式，所以在解析二元表达式时无须特殊照顾<code>(c+d)</code>这样的嵌套表达式。</p>
+<p>一开始，每个表达式都由一个主表达式打头阵，身后可能还跟着一串由有序对构成的列表，其中有序对的格式为<code>[binop, primaryexpr]</code>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// expression</span></span><br><span class="line"><span class="comment">///   ::= primary binoprhs</span></span><br><span class="line"><span class="comment">///</span></span><br><span class="line"><span class="function"><span class="type">static</span> ExprAST *<span class="title">ParseExpression</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  ExprAST *LHS = <span class="built_in">ParsePrimary</span>();</span><br><span class="line">  <span class="keyword">if</span> (!LHS) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">ParseBinOpRHS</span>(<span class="number">0</span>, LHS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>函数<code>ParseBinOpRHS</code>用于解析有序对列表（其中<code>RHS</code>是Right Hand Side的缩写，表示“右侧”；与此相对应，<code>LHS</code>表示“左侧”——译者注）。它的参数包括一个整数和一个指针，其中整数代表运算符优先级，指针则指向当前已解析出来的那部分表达式。注意，单独一个“<code>x</code>”也是合法的表达式：也就是说<code>binoprhs</code>有可能为空；碰到这种情况时，函数将直接返回作为参数传入的表达式。在上面的例子中，传入<code>ParseBinOpRHS</code>的表达式是“<code>a</code>”，当前语元是“<code>+</code>”。</p>
+<p>传入<code>ParseBinOpRHS</code>的优先级表示的是该函数所能处理的<strong>最低运算符优先级</strong>。假设语元流中的下一对是“<code>[+, x]</code>”，且传入<code>ParseBinOpRHS</code>的优先级是<code>40</code>，那么该函数将直接返回（因为“<code>+</code>”的优先级是<code>20</code>）。搞清楚这一点之后，我们再来看<code>ParseBinOpRHS</code>的定义，函数的开头是这样的：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// binoprhs</span></span><br><span class="line"><span class="comment">///   ::= (&#x27;+&#x27; primary)*</span></span><br><span class="line"><span class="function"><span class="type">static</span> ExprAST *<span class="title">ParseBinOpRHS</span><span class="params">(<span class="type">int</span> ExprPrec, ExprAST *LHS)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// If this is a binop, find its precedence.</span></span><br><span class="line">  <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="type">int</span> TokPrec = <span class="built_in">GetTokPrecedence</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If this is a binop that binds at least as tightly as the current binop,</span></span><br><span class="line">    <span class="comment">// consume it, otherwise we are done.</span></span><br><span class="line">    <span class="keyword">if</span> (TokPrec &lt; ExprPrec)</span><br><span class="line">      <span class="keyword">return</span> LHS;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码首先检查当前语元的优先级，如果优先级过低就直接返回。由于无效语元（这里指不是二元运算符的语元）的优先级都被判作<code>-1</code>，因此当语元流中的所有二元运算符都被处理完毕时，该检查自然不会通过。如果检查通过，则可知当前语元一定是二元运算符，应该被纳入当前表达式：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Okay, we know this is a binop.</span></span><br><span class="line"><span class="type">int</span> BinOp = CurTok;</span><br><span class="line"><span class="built_in">getNextToken</span>();  <span class="comment">// eat binop</span></span><br><span class="line">  </span><br><span class="line"><span class="comment">// Parse the primary expression after the binary operator.</span></span><br><span class="line">ExprAST *RHS = <span class="built_in">ParsePrimary</span>();</span><br><span class="line"><span class="keyword">if</span> (!RHS) <span class="keyword">return</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<p>就这样，二元运算符处理完毕（并保存妥当）之后，紧跟其后的主表达式也随之解析完毕。至此，本例中的第一对有序对<code>[+, b]</code>就构造完了。</p>
+<p>现在表达式的左侧和<code>RHS</code>序列中第一对都已经解析完毕，该考虑表达式的结合次序了。路有两条，要么选择“<code>(a+b) binop unparsed</code>”，要么选择“<code>a + (b binop unparsed)</code>”。为了搞清楚到底该怎么走，我们先预读出“<code>binop</code>”，查出它的优先级，再将之与<code>BinOp</code>（本例中是“<code>+</code>”）的优先级相比较：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// If BinOp binds less tightly with RHS than the operator after RHS, let</span></span><br><span class="line"><span class="comment">// the pending operator take RHS as its LHS.</span></span><br><span class="line"><span class="type">int</span> NextPrec = <span class="built_in">GetTokPrecedence</span>();</span><br><span class="line"><span class="keyword">if</span> (TokPrec &lt; NextPrec) &#123;</span><br></pre></td></tr></table></figure>
+
+<p><code>binop</code>位于“<code>RHS</code>”的右侧，如果<code>binop</code>的优先级低于或等于当前运算符的优先级，则可知括号应该加在前面，即按“<code>(a+b) binop ...</code>”处理。在本例中，当前运算符是“<code>+</code>”，下一个运算符也是“<code>+</code>”，二者的优先级相同。既然如此，理应按照“<code>a+b</code>”来构造AST节点，然后我们继续解析：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">      <span class="comment">// ... if body omitted ...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Merge LHS/RHS.</span></span><br><span class="line">    LHS = <span class="keyword">new</span> <span class="built_in">BinaryExprAST</span>(BinOp, LHS, RHS);</span><br><span class="line">  &#125;  <span class="comment">// loop around to the top of the while loop.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接着上面的例子，“<code>a+b+</code>”的前半段被解析成了“<code>(a+b)</code>”，于是“<code>+</code>”成为当前语元，进入下一轮迭代。上述代码进而将“<code>(c+d)</code>”识别为主表达式，并构造出相应的有序对<code>[+, (c+d)]</code>。现在，主表达式右侧的<code>binop</code>是“<code>*</code>”，由于“<code>*</code>”的优先级高于“<code>+</code>”，负责检查运算符优先级的<code>if</code>判断通过，执行流程得以进入<code>if</code>语句的内部。</p>
+<p>现在关键问题来了：<code>if</code>语句内的代码怎样才能完整解析出表达式的右半部分呢？尤其是，为了构造出正确的AST，变量<code>RHS</code>必须完整表达“<code>(c+d)*e*f</code>”。出人意料的是，写成代码之后，这个问题出奇地简单：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">    <span class="comment">// If BinOp binds less tightly with RHS than the operator after RHS, let</span></span><br><span class="line">    <span class="comment">// the pending operator take RHS as its LHS.</span></span><br><span class="line">    <span class="type">int</span> NextPrec = <span class="built_in">GetTokPrecedence</span>();</span><br><span class="line">    <span class="keyword">if</span> (TokPrec &lt; NextPrec) &#123;</span><br><span class="line">      RHS = <span class="built_in">ParseBinOpRHS</span>(TokPrec+<span class="number">1</span>, RHS);</span><br><span class="line">      <span class="keyword">if</span> (RHS == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Merge LHS/RHS.</span></span><br><span class="line">    LHS = <span class="keyword">new</span> <span class="built_in">BinaryExprAST</span>(BinOp, LHS, RHS);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看一下主表达式右侧的二元运算符，我们发现它的优先级比当前正在解析的<code>binop</code>的优先级要高。由此可知，如果自<code>binop</code>以右的若干个连续有序对都含有优先级高于“<code>+</code>”的运算符，那么就应该把它们全部解析出来，拼成“<code>RHS</code>”后返回。为此，我们将最低优先级设为“<code>TokPrec+1</code>”，递归调用函数“<code>ParseBinOpRHS</code>”。该调用会完整解析出上述示例中的“<code>(c+d)*e*f</code>”，并返回构造出的AST节点，这个节点就是“<code>+</code>”表达式右侧的<code>RHS</code>。</p>
+<p>最后，<code>while</code>循环的下一轮迭代将会解析出剩下的“<code>+g</code>”并将之纳入AST。仅需区区14行代码，我们就完整而优雅地实现了通用的二元表达式解析算法。</p>
+</li>
+<li><h1 id="解析其余结构"><a href="#解析其余结构" class="headerlink" title="解析其余结构"></a>解析其余结构</h1><p>下面来解析函数原型。在Kaleidoscope语言中，有两处会用到函数原型：一是“<code>extern</code>”函数声明，二是函数定义。相关代码很简单：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// prototype</span></span><br><span class="line"><span class="comment">///   ::= id &#x27;(&#x27; id* &#x27;)&#x27;</span></span><br><span class="line"><span class="function"><span class="type">static</span> PrototypeAST *<span class="title">ParsePrototype</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (CurTok != tok_identifier)</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">ErrorP</span>(<span class="string">&quot;Expected function name in prototype&quot;</span>);</span><br><span class="line"></span><br><span class="line">  std::string FnName = IdentifierStr;</span><br><span class="line">  <span class="built_in">getNextToken</span>();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (CurTok != <span class="string">&#x27;(&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">ErrorP</span>(<span class="string">&quot;Expected &#x27;(&#x27; in prototype&quot;</span>);</span><br><span class="line"></span><br><span class="line">  std::vector&lt;std::string&gt; ArgNames;</span><br><span class="line">  <span class="keyword">while</span> (<span class="built_in">getNextToken</span>() == tok_identifier)</span><br><span class="line">    ArgNames.<span class="built_in">push_back</span>(IdentifierStr);</span><br><span class="line">  <span class="keyword">if</span> (CurTok != <span class="string">&#x27;)&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">ErrorP</span>(<span class="string">&quot;Expected &#x27;)&#x27; in prototype&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// success.</span></span><br><span class="line">  <span class="built_in">getNextToken</span>();  <span class="comment">// eat &#x27;)&#x27;.</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">PrototypeAST</span>(FnName, ArgNames);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在此基础之上，函数定义就很简单了，说白了就是一个函数原型再加一个用作函数体的表达式：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// definition ::= &#x27;def&#x27; prototype expression</span></span><br><span class="line"><span class="function"><span class="type">static</span> FunctionAST *<span class="title">ParseDefinition</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="built_in">getNextToken</span>();  <span class="comment">// eat def.</span></span><br><span class="line">  PrototypeAST *Proto = <span class="built_in">ParsePrototype</span>();</span><br><span class="line">  <span class="keyword">if</span> (Proto == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (ExprAST *E = <span class="built_in">ParseExpression</span>())</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">FunctionAST</span>(Proto, E);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了用于用户自定义函数的前置声明，“<code>extern</code>”语句还可以用来声明“<code>sin</code>”、“<code>cos</code>”等（C标准库）函数。这些“<code>extern</code>”语句不过就是些不带函数体的函数原型罢了：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// external ::= &#x27;extern&#x27; prototype</span></span><br><span class="line"><span class="function"><span class="type">static</span> PrototypeAST *<span class="title">ParseExtern</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="built_in">getNextToken</span>();  <span class="comment">// eat extern.</span></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">ParsePrototype</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后，我们还允许用户随时在顶层输入任意表达式并求值。这一特性是通过一个特殊的匿名零元函数（没有任何参数的函数）实现的，所有顶层表达式都定义在这个函数之内：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">最后，我们还允许用户随时在顶层输入任意表达式并求值。这一特性是通过一个特殊的匿名零元函数（没有任何参数的函数）实现的，所有顶层表达式都定义在这个函数之内：</span><br><span class="line"></span><br><span class="line"><span class="comment">/// toplevelexpr ::= expression</span></span><br><span class="line"><span class="function"><span class="type">static</span> FunctionAST *<span class="title">ParseTopLevelExpr</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (ExprAST *E = <span class="built_in">ParseExpression</span>()) &#123;</span><br><span class="line">    <span class="comment">// Make an anonymous proto.</span></span><br><span class="line">    PrototypeAST *Proto = <span class="keyword">new</span> <span class="built_in">PrototypeAST</span>(<span class="string">&quot;&quot;</span>, std::<span class="built_in">vector</span>&lt;std::string&gt;());</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">FunctionAST</span>(Proto, E);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/posts/dd102aff/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            AFL源码分析(一)
+          
+        </div>
+      </a>
+    
+    
+      <a href="/posts/f54b4e18/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">CVE-2018-17463详细分析及复现</div>
+      </a>
+    
+  </nav>
+
+  
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2022-2023
+        <i class="ri-heart-fill heart_icon"></i> h1J4cker
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/h1J4cker.svg" alt="h1J4cker&#39;s Blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<script src="https://cdn.staticfile.org/animejs/3.2.1/anime.min.js"></script>
+
+<script src="/js/clickBoom1.js"></script>
+ 
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+ 
+<script src="/js/dz.js"></script>
+ 
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>
